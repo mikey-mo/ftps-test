@@ -1,12 +1,14 @@
 require('dotenv').config();
 const Client = require('ssh2').Client;
 const fs = require('fs');
-const conn = new Client();
+const csvWriter = require('csv-write-stream');
 
 let DEFAULT_CHECK_TIME;
-
+let TICKET_HOLDER = false;
+let ATTENDED_GAMES = 20;
 DEFAULT_CHECK_TIME = process.env.CHECK_TIME;
 
+const conn = new Client();
 const settings = {
     host: process.env.FTPS_HOST,
     port: process.env.FTPS_PORT,
@@ -25,6 +27,7 @@ const updateRemoteFile = (sftp) => {
     const writeStream = sftp.createWriteStream('/FAN_DATA.csv');
     writeStream.on('close', () => {
         console.log('file transfer to remote successful');
+        DEFAULT_CHECK_TIME = getUnixTimestamp();
     });
     readStream.on('end', () => {
         console.log('read stream successful');
@@ -40,8 +43,8 @@ const remoteFileUpdated = (sftp) => {
     sftp.fastGet('/FAN_DATA.csv', './test-files/FAN_DATA.csv', {}, (err) => {
         if (err) throw err;
         console.log('successfully updated local file');
-        DEFAULT_CHECK_TIME = getUnixTimestamp();
     });
+    DEFAULT_CHECK_TIME = getUnixTimestamp();
 }
 
 const readRemoteFile = (sftp) => {
@@ -57,14 +60,29 @@ const readRemoteFile = (sftp) => {
     });
 }
 
+const updateLocalFile = (sftp) => {
+    const writer = csvWriter({ sendHeaders: false, includeEndRowDelimiter: true });
+    writer.pipe(fs.createWriteStream('./test-files/FAN_DATA.csv', { flags: 'as+', includeEndRowDelimiter: true }));
+    writer.write({
+        email: 'email@email.com',
+        birthday: 123123412,
+        ticket_holder: !TICKET_HOLDER,
+        attended_games: ++ATTENDED_GAMES,
+    });
+    TICKET_HOLDER = !TICKET_HOLDER;
+    writer.end();
+    console.log('updated local file');
+    updateRemoteFile(sftp);
+}
+
 conn.on('ready', () => {
     conn.sftp((err, sftp) => {
         if (err) throw err;
-
         setInterval(() => {
             readRemoteFile(sftp);
-        }, 5000);
-
-        // updateRemoteFile(sftp);
+        }, 10000);
+        setInterval(() => {
+            updateLocalFile(sftp);
+        }, 30000);
     })
 }).connect(settings);
