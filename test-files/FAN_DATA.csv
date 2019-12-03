@@ -1,2 +1,4 @@
+FAN_DATA
 email, birthday, ticket_holder, attended_games
-mikey@jigsaw.xyz, 1575399661, true, 22
+mikey@jigsaw.xyz,1575399661,TRUE,22
+stef@jigsaw.xyz,1234567890,FALSE,10

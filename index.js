@@ -18,10 +18,7 @@ const getUnixTimestamp = () => Math.floor(new Date().getTime() / 1000)
 
 const filterForCorrectFile= (files, filename) => files.filter(file => file.filename === filename)[0];
 
-const checkIfNewerTimestamp = (newTime, oldTime) => {
-    console.log(newTime, oldTime);
-    return newTime > oldTime;
-}
+const checkIfNewerTimestamp = (newTime, oldTime) => newTime > oldTime;
 
 const updateRemoteFile = (sftp) => {
     const readStream = fs.createReadStream('./test-files/FAN_DATA.csv');
