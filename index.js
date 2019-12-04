@@ -83,6 +83,6 @@ conn.on('ready', () => {
         }, 10000);
         setInterval(() => {
             updateLocalFile(sftp);
-        }, 30000);
+        }, 45000);
     })
 }).connect(settings);
