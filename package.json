@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "csv-write-stream": "^2.0.0",
     "dotenv": "^8.2.0",
     "ftp": "^0.3.10",
